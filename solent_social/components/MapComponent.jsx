@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { db } from "./firebase_conf";
 
 const MapComponent = () => {
     // Create a ref for the map container div
@@ -24,7 +25,7 @@ const MapComponent = () => {
     }, []);
 
     return (
-        <div ref={mapRef} style={{ border: "1px solid black", height: "500px", width: "80%"}}></div>
+        <div ref={mapRef} style={{ border: "1px solid black", height: "500px", width: "100%"}}></div>
     );
 };
 

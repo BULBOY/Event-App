@@ -1,21 +1,49 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "./firebase_conf";
 import MapComponent from "./MapComponent";
 import 'leaflet/dist/leaflet.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import AdminPg from "./adminPage";
 
 const Home = () => {
     const [user, setUser] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
+        const checkAdminStatus = async (userId) => {
+            try {
+                const userDocRef = doc(db, "users", userId);
+                const userDoc = await getDoc(userDocRef);
+                
+                if (userDoc.exists()) {
+                    const adminStatus = userDoc.data().is_admin === true;
+                    setIsAdmin(adminStatus);
+                }
+            } catch (error) {
+                console.error("Error checking admin status:", error);
+            }
+        };
+
         const userData = sessionStorage.getItem('user');
         if (userData) {
-            setUser(JSON.parse(userData));
+            const parsedUser = JSON.parse(userData);
+            setUser(parsedUser);
+            
+            if (parsedUser?.uid) {
+                checkAdminStatus(parsedUser.uid);
+            }
         }
 
         const handleLogin = (event) => {
-            setUser(event.detail.user);
+            const loggedInUser = event.detail.user;
+            setUser(loggedInUser);
+            
+            if (loggedInUser?.uid) {
+                checkAdminStatus(loggedInUser.uid);
+            }
         };
 
         window.addEventListener('userLogin', handleLogin);
@@ -25,6 +53,7 @@ const Home = () => {
     const handleLogout = () => {
         sessionStorage.removeItem('user');
         setUser(null);
+        setIsAdmin(false);
         navigate('/');
     };
 
@@ -34,6 +63,11 @@ const Home = () => {
                 <span className="text-white me-3">
                     Welcome, {user.displayName || user.email}
                 </span>
+                {/* {isAdmin && (
+                    <Link to='/admin' className="btn btn-warning me-2">
+                        Admin Panel
+                    </Link>
+                )} */}
                 <button 
                     className="btn btn-light"
                     onClick={handleLogout}
@@ -74,7 +108,7 @@ const Home = () => {
                 </header>
             </div>
 
-            <div className="container mb-4">
+            <div className="container mb-4" >
                 <div className="row justify-content-center">
                     <div className="col-md-6">
                         <div className="input-group">
@@ -97,12 +131,22 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-
+            
             <div className="container flex-grow-1">
                 <div className="row h-100">
                     <div className="col">
                         <div style={{ height: '75vh' }}>
-                            <MapComponent />
+                            {!isAdmin && (
+                                <MapComponent />
+                            )}
+                            <br />
+                            {isAdmin && (
+                            <><h1 style={{textAlign:'center', color:'red'}}>Admin Panel</h1>
+                                <div>
+                                    <AdminPg />
+                                </div>
+                                </>
+                                )}
                         </div>
                     </div>
                 </div>

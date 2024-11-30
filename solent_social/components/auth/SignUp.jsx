@@ -10,6 +10,7 @@ const SignUp = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [listOfEvents, setListOfEvents] = useState([]);
     const [createUserWithEmailAndPassword, user, loading, error] = useCreateUserWithEmailAndPassword(auth);
     const [updateProfile, updating, updateError] = useUpdateProfile(auth);
     
@@ -30,6 +31,8 @@ const SignUp = () => {
                     email: email,
                     createdAt: new Date(),
                     is_admin: false,
+                    eventList: listOfEvents,
+
                   });    
 
             setName('');

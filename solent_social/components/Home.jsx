@@ -6,11 +6,15 @@ import MapComponent from "./MapComponent";
 import 'leaflet/dist/leaflet.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AdminPg from "./adminPage";
+import EventList from "./functions/userPage";
+
 
 const Home = () => {
     const [user, setUser] = useState(null);
+    const [eventType, seteventType] = useState('');
     const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
         const checkAdminStatus = async (userId) => {
@@ -31,6 +35,8 @@ const Home = () => {
         if (userData) {
             const parsedUser = JSON.parse(userData);
             setUser(parsedUser);
+            setIsLoggedIn(parsedUser.isLoggedIn)
+            
             
             if (parsedUser?.uid) {
                 checkAdminStatus(parsedUser.uid);
@@ -54,7 +60,9 @@ const Home = () => {
         sessionStorage.removeItem('user');
         setUser(null);
         setIsAdmin(false);
+        setIsLoggedIn(false);
         navigate('/');
+        window.location.reload();
     };
 
     const AuthNav = () => (
@@ -63,11 +71,6 @@ const Home = () => {
                 <span className="text-white me-3">
                     Welcome, {user.displayName || user.email}
                 </span>
-                {/* {isAdmin && (
-                    <Link to='/admin' className="btn btn-warning me-2">
-                        Admin Panel
-                    </Link>
-                )} */}
                 <button 
                     className="btn btn-light"
                     onClick={handleLogout}
@@ -111,23 +114,26 @@ const Home = () => {
             <div className="container mb-4" >
                 <div className="row justify-content-center">
                     <div className="col-md-6">
-                        <div className="input-group">
-                            <span className="input-group-text bg-white">
-                                Event type
-                            </span>
-                            <input 
-                                type="text" 
-                                className="form-control"
-                                id="events"
-                                aria-label="Event type"
-                            />
-                            <button 
-                                className="btn btn-danger"
-                                onClick={() => {}}
-                            >
-                                Search
-                            </button>
-                        </div>
+                    {!isAdmin && (
+                                <div className="input-group">
+                                <span className="input-group-text bg-white">
+                                    Event type
+                                </span>
+                                <input 
+                                    type="text" 
+                                    className="form-control"
+                                    id="events"
+                                    aria-label="Event type"
+                                />
+                                <button 
+                                    className="btn btn-danger"
+                                    onClick={() => {}}
+                                >
+                                    Search
+                                </button>
+                            </div>
+                            )}
+                       
                     </div>
                 </div>
             </div>
@@ -137,7 +143,10 @@ const Home = () => {
                     <div className="col">
                         <div style={{ height: '75vh' }}>
                             {!isAdmin && (
-                                <MapComponent />
+                                <>
+                                 <MapComponent />
+                                 {isLoggedIn && (<EventList />)} 
+                                 </>                             
                             )}
                             <br />
                             {isAdmin && (

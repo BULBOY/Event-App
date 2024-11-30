@@ -19,34 +19,8 @@ const SignIn = () => {
           isLoggedIn: true,
           loginTime: new Date().toISOString()
         }));
+        console.log(userData)
       };
-// class SignIn extends Component {
-//     // constructor(props) {
-//     //     super(props);
-//     //     this.state = {
-//     //         email: '',
-//     //         password: ''
-//     //     };
-//     // }
-
-//     // changeHandler = (event) => {
-//     //     this.setState({ [event.target.name]: event.target.value });
-//     // };
-
-//     // signinhandler = async () => {
-//     //     const {email, password} = this.state;
-//     //     try {
-//     //         await auth.signInWithEmailAndPassword(email, password);
-//     //         alert('Signed in successfully!');
-//     //     }catch(error) {
-//     //         alert(error.message)
-//     //     }
-//     // }
-
-//     satate = {
-//         email: '',
-//         password: ''
-//     }
 
 const handleSignIn = async (e) => {
     e.preventDefault();
@@ -68,6 +42,7 @@ const handleSignIn = async (e) => {
 
       // Save user data to session storage
       saveToSessionStorage(userData);
+      
 
       // Dispatch a custom event to notify other components about the login
       window.dispatchEvent(new CustomEvent('userLogin', { 

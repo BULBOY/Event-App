@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "./firebase_conf";
-import { addDoc, collection, getDocs, deleteDoc } from "firebase/firestore";
+import { addDoc, collection, getDocs, deleteDoc,doc, updateDoc } from "firebase/firestore";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AdminPg = () => {
@@ -21,7 +21,7 @@ const AdminPg = () => {
         const fetchEvents = async () => {
             try {
                 const querySnapshot = await getDocs(collection(db, 'event_list'));
-                const eventsList = querySnapshot.docs.map(doc => ({
+                const eventsList = querySnapshot.docs.map(doc => ({ 
                     id: doc.id,
                     ...doc.data()
                 }));
@@ -223,8 +223,7 @@ const AdminPg = () => {
                                 </div>
                                 <div className="card-body">
                                     <form onSubmit={editingEvent ? handleEventUpdate : handleEventCreate}>
-                                    {/* <div className="card-body">
-                                    <form onSubmit={handleEventCreate}> */}
+                                   
                                         <div className="row mb-3">
                                             <div className="col-md-4">
                                                 <label className="form-label">Event Name</label>

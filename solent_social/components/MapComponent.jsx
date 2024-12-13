@@ -13,6 +13,9 @@ const MapComponent = () => {
     const [error, setError] = useState(null);
     const [user, setUser] = useState({});
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [filteredEvents, setFilteredEvents] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [noEventsFound, setNoEventsFound] = useState(false);
 
     const mapRef = useRef(null);
     const mapInstanceRef = useRef(null);
@@ -39,6 +42,7 @@ const MapComponent = () => {
                     ...doc.data(),
                 }));
                 setEvents(eventsList);
+                setFilteredEvents(eventsList);
             } catch (err) {
                 console.error("Error fetching events: ", err);
                 setError(err);
@@ -56,21 +60,47 @@ const MapComponent = () => {
         }
     }, []);
 
+    const handleSearch = (e) => {
+        const term = e.target.value.toLowerCase();
+        setSearchTerm(term);
+    
+        // If search term is empty, show all events
+        if (term === '') {
+            setFilteredEvents(events);
+        } else {
+            // Filter events by type
+            const filtered = events.filter((event) => 
+                event.type && event.type.toLowerCase().includes(term)
+            );
+            setFilteredEvents(filtered);
+        }
+    };
+
     useEffect(() => {
         if (mapRef.current && events.length > 0) {
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
+            // If map doesn't exist, create it
+            if (!mapInstanceRef.current) {
+                const map = L.map(mapRef.current).setView([55.9533, 3.1883], 4);
+    
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                }).addTo(map);
+    
+                mapInstanceRef.current = map;
             }
-
-            const map = L.map(mapRef.current).setView([51.505, -0.09], 10);
-
-            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            }).addTo(map);
-
-            events.forEach((event) => {
+    
+            // Clear existing markers
+            if (window.markers) {
+                window.markers.forEach(marker => marker.remove());
+            }
+            window.markers = [];
+    
+            // Use filteredEvents if it has content, otherwise use all events
+            const eventsToRender = filteredEvents.length > 0 ? filteredEvents : events;
+    
+            eventsToRender.forEach((event) => {
                 if (event.latitude && event.longitude) {
-                    const marker = L.marker([event.latitude, event.longitude]).addTo(map);
+                    const marker = L.marker([event.latitude, event.longitude]).addTo(mapInstanceRef.current);
             
                     const popupContent = `
                         <strong>Event Name: ${event.eventName || ""}</strong><br>
@@ -87,23 +117,47 @@ const MapComponent = () => {
                         const bookButton = document.getElementById(`book-${event.id}`);
                         if (bookButton) {
                             bookButton.addEventListener("click", () => {
-                                handleBooking(event.id, user.uid); // Call the booking function with event and user details
+                                handleBooking(event.id, user.uid);
                             });
                         }
                     });
+    
+                    // Store markers globally to manage them
+                    if (!window.markers) {
+                        window.markers = [];
+                    }
+                    window.markers.push(marker);
                 }
             });
-            
+        }
+    
+        // No return cleanup function to prevent map removal
+    }, [events, filteredEvents, user]);
 
-            mapInstanceRef.current = map;
+    const handleInputChange = (e) => {
+        const term = e.target.value.toLowerCase();
+        setSearchTerm(term);
+        setNoEventsFound(false); // Reset no events found state
+
+        // If search term is empty, show all events
+        if (term === '') {
+            setFilteredEvents(events);
+            return;
         }
 
-        return () => {
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
-            }
-        };
-    }, [events, user]);
+        // Filter events by type
+        const filtered = events.filter((event) => 
+            event.type && event.type.toLowerCase().includes(term)
+        );
+
+        // Set filtered events and check if no events found
+        setFilteredEvents(filtered);
+        
+        // Only set noEventsFound to true if there are no matches and term is not empty
+        if (filtered.length === 0 && term !== '') {
+            setNoEventsFound(true);
+        }
+    };
 
     const handleBooking = async (eventId, userId) => {
         try {
@@ -163,15 +217,47 @@ const MapComponent = () => {
     }
 
     return (
-        <div
-            ref={mapRef}
-            style={{
-                border: "1px solid black",
-                height: "500px",
-                width: "100%",
-            }}
-        >
-            {events.length === 0 && <div>Loading events...</div>}
+        <div className="min-vh-50 d-flex flex-column">
+            <div className="container mb-4">
+                <div className="row justify-content-center">
+                    <div className="col-md-6">
+                        <div className="input-group">
+                            <span className="input-group-text bg-danger text-white" >
+                                Search events by type
+                            </span>
+                            <input 
+                                type="text" 
+                                className="form-control"
+                                id="events"
+                                aria-label="Event type"
+                                value={searchTerm}
+                                onChange={handleInputChange}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {noEventsFound && (
+                <div className="container text-center my-4">
+                    <div className="alert alert-warning" role="alert">
+                        No events found for type "{searchTerm}". 
+                        Try a different event type or clear the search.
+                    </div>
+                </div>
+            )}
+
+            <div
+                ref={mapRef}
+                style={{
+                    border: "1px solid black",
+                    height: "500px",
+                    width: "100%",
+                }}
+            >
+                {events.length === 0 && <div>Loading events...</div>}
+            </div>
         </div>
     );
 };

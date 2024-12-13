@@ -9,6 +9,7 @@ import AdminPg from "./adminPage";
 import EventList from "./functions/userPage";
 
 
+
 const Home = () => {
     const [user, setUser] = useState(null);
     const [eventType, seteventType] = useState('');
@@ -109,33 +110,6 @@ const Home = () => {
                         </div>
                     </nav>
                 </header>
-            </div>
-
-            <div className="container mb-4" >
-                <div className="row justify-content-center">
-                    <div className="col-md-6">
-                    {!isAdmin && (
-                                <div className="input-group">
-                                <span className="input-group-text bg-white">
-                                    Event type
-                                </span>
-                                <input 
-                                    type="text" 
-                                    className="form-control"
-                                    id="events"
-                                    aria-label="Event type"
-                                />
-                                <button 
-                                    className="btn btn-danger"
-                                    onClick={() => {}}
-                                >
-                                    Search
-                                </button>
-                            </div>
-                            )}
-                       
-                    </div>
-                </div>
             </div>
             
             <div className="container flex-grow-1">

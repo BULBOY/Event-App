@@ -54,6 +54,13 @@ const AdminPg = () => {
             console.log("Event created with ID: ", eventRef.id);
             resetForm();
             setShowCreateForm(false);
+            // Refresh events list
+            const querySnapshot = await getDocs(collection(db, 'event_list'));
+            const eventsList = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setEvents(eventsList);
         } catch(error) {
             console.error("Error creating event: ", error);
         }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
-import { db } from "../firebase_conf";
+import { db } from "./firebase_conf";
 
 const EventList = () => {
   const [events, setEvents] = useState([]);

@@ -80,7 +80,7 @@ const MapComponent = () => {
         if (mapRef.current && events.length > 0) {
             // If map doesn't exist, create it
             if (!mapInstanceRef.current) {
-                const map = L.map(mapRef.current).setView([55.9533, 3.1883], 4);
+                const map = L.map(mapRef.current).setView([51.9533, 0.1883],7);
     
                 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',

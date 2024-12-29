@@ -6,14 +6,13 @@ import MapComponent from "./MapComponent";
 import 'leaflet/dist/leaflet.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AdminPg from "./adminPage";
-import EventList from "./functions/userPage";
-
-
+import EventList from "./eventPage";
 
 const Home = () => {
     const [user, setUser] = useState(null);
     const [eventType, seteventType] = useState('');
     const [isAdmin, setIsAdmin] = useState(false);
+    const [showAdminPanel, setShowAdminPanel] = useState(false);
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -38,7 +37,6 @@ const Home = () => {
             setUser(parsedUser);
             setIsLoggedIn(parsedUser.isLoggedIn)
             
-            
             if (parsedUser?.uid) {
                 checkAdminStatus(parsedUser.uid);
             }
@@ -62,6 +60,7 @@ const Home = () => {
         setUser(null);
         setIsAdmin(false);
         setIsLoggedIn(false);
+        setShowAdminPanel(false);
         navigate('/');
         window.location.reload();
     };
@@ -72,6 +71,14 @@ const Home = () => {
                 <span className="text-white me-3">
                     Welcome, {user.displayName || user.email}
                 </span>
+                {isAdmin && (
+                    <button 
+                        className="btn btn-warning me-3"
+                        onClick={() => setShowAdminPanel(!showAdminPanel)}
+                    >
+                        {showAdminPanel ? 'My Events' : 'Edit Events'}  
+                    </button>
+                )}
                 <button 
                     className="btn btn-light"
                     onClick={handleLogout}
@@ -116,20 +123,17 @@ const Home = () => {
                 <div className="row h-100">
                     <div className="col">
                         <div style={{ height: '75vh' }}>
-                            {!isAdmin && (
+                            {!showAdminPanel ? (
                                 <>
-                                 <MapComponent />
-                                 {isLoggedIn && (<EventList />)} 
-                                 </>                             
-                            )}
-                            <br />
-                            {isAdmin && (
-                            <><h1 style={{textAlign:'center', color:'red'}}>Admin Panel</h1>
-                                <div>
-                                    <AdminPg />
-                                </div>
+                                    <MapComponent />
+                                    {isLoggedIn && <EventList />}
                                 </>
-                                )}
+                            ) : (
+                                <>
+                                    <h1 style={{textAlign:'center', color:'red'}}>Admin Panel</h1>
+                                    <AdminPg />
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

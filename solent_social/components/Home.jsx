@@ -16,6 +16,7 @@ const Home = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+    // Effect to check admin status and load user data from session storage
     useEffect(() => {
         const checkAdminStatus = async (userId) => {
             try {
@@ -31,6 +32,7 @@ const Home = () => {
             }
         };
 
+        // Load user data from session storage
         const userData = sessionStorage.getItem('user');
         if (userData) {
             const parsedUser = JSON.parse(userData);
@@ -42,6 +44,7 @@ const Home = () => {
             }
         }
 
+        // Event listener for user login
         const handleLogin = (event) => {
             const loggedInUser = event.detail.user;
             setUser(loggedInUser);
@@ -55,6 +58,7 @@ const Home = () => {
         return () => window.removeEventListener('userLogin', handleLogin);
     }, []);
 
+    // Handle user logout
     const handleLogout = () => {
         sessionStorage.removeItem('user');
         setUser(null);
@@ -64,7 +68,7 @@ const Home = () => {
         navigate('/');
         window.location.reload();
     };
-
+    // Component for authentication navigation
     const AuthNav = () => (
         user ? (
             <div className="d-flex align-items-center">

@@ -9,6 +9,7 @@ const EventList = () => {
   const [userId, setUserId] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState(null);
 
+  // Fetch events on component mount
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -43,6 +44,7 @@ const EventList = () => {
     fetchEvents();
   }, []);
 
+  // Handle event deletion
   const handleDeleteEvent = async (userId, eventId) => {
     try {
       const userDocRef = doc(db, 'users', userId);
@@ -70,6 +72,7 @@ const EventList = () => {
     }
   };
 
+   // Toggle event details visibility
   const toggleEventDetails = (eventId) => {
     setSelectedEventId(prevId => prevId === eventId ? null : eventId);
   };
@@ -78,7 +81,7 @@ const EventList = () => {
   if (error) return <div>Error loading events</div>;
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 mb-5">
       <h2 className="mb-4">Booked events</h2>
 
       <div className="list-group">

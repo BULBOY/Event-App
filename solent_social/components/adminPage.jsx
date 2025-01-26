@@ -17,6 +17,7 @@ const AdminPg = () => {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [editingEvent, setEditingEvent] = useState(null);
 
+    // Fetch events on component mount
     useEffect(() => {
         const fetchEvents = async () => {
             try {
@@ -37,6 +38,7 @@ const AdminPg = () => {
         fetchEvents();
     }, []);
 
+    // Handle event creation
     const handleEventCreate = async (e) => {
         e.preventDefault();
         try {
@@ -66,6 +68,7 @@ const AdminPg = () => {
         }
     }
 
+    // Handle event update
     const handleEventUpdate = async (e) => {
         e.preventDefault();
         if (!editingEvent) return;
@@ -116,6 +119,7 @@ const AdminPg = () => {
         }
     }
 
+    // Start editing an event
     const startEditEvent = (event) => {
         setEditingEvent(event);
         setEventName(event.eventName);
@@ -128,6 +132,7 @@ const AdminPg = () => {
         setShowCreateForm(true);
     }
 
+    // Reset form fields
     const resetForm = () => {
         setEventName('');
         setType('');

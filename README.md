@@ -12,15 +12,15 @@ How to Run
 
 Navigate to the project folder: Go to the directory where the project files are stored:
 
-cd solent_social
+    cd solent_social
 
 Install dependencies: Install the necessary dependencies for the project:
 
-npm install
+    npm install
 
 Run the app in development mode: Start the development server with the command:
 
-npm run dev
+    npm run dev
 
 The application will be available at http://localhost:5173.
 
